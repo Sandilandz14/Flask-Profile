@@ -1,36 +1,36 @@
-from flask import Flask, render_template, url_for, redirect
+from flask import Flask, render_template, Flask, request
 from flask_mail import Mail, Message
+from smtplib import SMTP
+
+
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/contact/')
 def index():
     return render_template('index.html')
 
-mail = Mail(app)
-app.config['MAIL_SERVER']='smtp.gmail.com'
-app.config['MAIL_PORT'] = 465
-app.config['MAIL_USERNAME'] = 'stukani100@gmail.com'
-app.config['MAIL_PASSWORD'] = 'sandilandz4teen'
-app.config['MAIL_USE_TLS'] = False
-app.config['MAIL_USE_SSL'] = True
-mail = Mail(app)
+@app.route('/mail/',methods=["POST"])
+def send_mail():
+   try:
+       sender_email = request.form[('firstname')]
+       receiver_email = "type-receiver-address@gmail.com"
+       password = "88888"
+       lastname = request.form[('lastname')]
+       message = request.form[('subject')]
+       server = SMTP('smtp.gmail.com', 587)
+       server.starttls()
 
-@app.route("/")
-def index():
-   msg = Message('Hello', sender = 'yourID@gmail.com', recipients = ['stukani100@gmail.com'])
-   msg.body = "Hello Flask message sent from Flask-Mail"
-   mail.send(msg)
-   return "Sent"
+       server.login(receiver_email, password )
+       server.sendmail(sender_email, receiver_email, 'This is a test email.')
+       print('the message has been successfully sent')
+
+   except Exception as err:
+       print("Something went wrong..", err)
+   finally:
+       server.close()
 
 if __name__ == '__main__':
    app.run(debug = True)
-# @app.route('/grading/<int:grades>')
-# def marks(grades):
-#     return render_template('index.html',mark=grades)
-
-
-if __name__=='__main__':
-    app.run(debug=True)
 
 
 
